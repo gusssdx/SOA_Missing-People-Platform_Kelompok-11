@@ -1,4 +1,4 @@
-# Missing People Platform
+# Missing People Platform : 'FINDER'
 
 Kelompok 11:
 1. Riyan Suseno - 2310511051
