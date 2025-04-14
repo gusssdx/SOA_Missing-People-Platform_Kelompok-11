@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daftar Orang Ditemukan</title>
+  <style>
+    /* [Salin semua style sama seperti sebelumnya] */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    .navbar {
+      height: 15vh;
+      padding: 10px 5%;
+      background-color: #C3E4FF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      height: 50px;
+    }
+
+    .search-bar {
+      display: flex;
+      height: 40%;
+      width: 25%;
+      background-color: #fff;
+      border: none;
+      padding: 1em;
+      border-radius: 8px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .nav-menu {
+      list-style: none;
+      display: flex;
+      gap: 4em;
+      font-weight: bold;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: #000;
+    }
+
+    .main-content {
+      display: flex;
+      width: 100%;
+      padding: 2em 5%;
+    }
+
+    .filter {
+      width: 20%;
+      background-color: #fff;
+      padding: 1em;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      height: fit-content;
+    }
+
+    .filter h3 {
+      margin-bottom: 1em;
+      font-size: 18px;
+    }
+
+    .filter div {
+      margin-bottom: 1em;
+      font-size: 14px;
+    }
+
+    .filter input[type="checkbox"],
+    .filter input[type="radio"] {
+      margin-right: 0.5em;
+    }
+
+    .filter select,
+    .filter input[type="date"],
+    .filter input[type="range"] {
+      width: 100%;
+      margin-top: 0.5em;
+      padding: 4px;
+    }
+
+    .container {
+      width: 80%;
+      padding-left: 2em;
+    }
+
+    .container h1 {
+      margin-bottom: 1em;
+      text-align: center;
+    }
+
+    #foundPersonsList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2em;
+      justify-content: flex-start;
+      margin-left: 30px;
+    }
+
+    .card {
+      width: 250px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 1em;
+      text-align: center;
+    }
+
+    .card img {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    .card h3 {
+      margin: 10px 0 5px;
+    }
+
+    .card p {
+      font-size: 14px;
+      margin: 4px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav class="navbar">
+      <img src="img/logo.png" alt="Logo" class="logo" />
+      <input type="text" placeholder="Search..." class="search-bar" />
+      <ul class="nav-menu">
+        <li><a href="MissingPersons.html" class="nav-link">Missing</a></li>
+        <li><a href="FoundPerson.html" class="nav-link">Found</a></li>
+        <li><a href="#" class="nav-link">Reports</a></li>
+        <li><a href="#" class="nav-link">Settings</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="main-content">
+    <aside class="filter">
+      <h3>Filters</h3>
+      <div>
+        <strong>Gender</strong><br/>
+        <input type="radio" name="gender" /> Male
+        <input type="radio" name="gender" /> Female
+      </div>
+      <div style="margin-bottom: 1em;">
+        <strong>Age</strong><br>
+        <input type="range" min="1" max="100" id="ageRange">
+        <span id="ageValue">50</span> tahun
+      </div>    
+      <div>
+        <strong>Location</strong><br/>
+        <select>
+          <option>All</option>
+          <option>Jakarta</option>
+          <option>Bogor</option>
+        </select>
+      </div>
+      <div>
+        <strong>Date</strong><br/>
+        <input type="date" />
+      </div>
+      <div id="userCard" style="background-color: #fff; padding: 1em; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-top: 2em;"></div>
+    </aside>
+
+    <div class="container">
+      <div id="foundPersonsList"></div>
+    </div>
+  </div>
+
+  <script>
+    const ageRange = document.getElementById('ageRange');
+    const ageValue = document.getElementById('ageValue');
+
+    ageRange.addEventListener('input', () => {
+      ageValue.textContent = ageRange.value;
+    });
+    ageValue.textContent = ageRange.value;
+
+    async function fetchFoundPersons() {
+      try {
+        const response = await fetch("http://localhost:5000/found-persons");
+        const data = await response.json();
+        const container = document.getElementById("foundPersonsList");
+        container.innerHTML = "";
+
+        data.forEach((person) => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <img src="img/placeholder.png">
+            <p><strong>Lokasi:</strong> ${person.found_location}</p>
+            <p><strong>Tanggal Ditemukan:</strong> ${new Date(person.found_date).toISOString().split('T')[0]}</p>
+            <p><strong>Deskripsi:</strong> ${person.description}</p>
+            <p>Status: <strong>${person.status}</strong></p>
+          `;
+          container.appendChild(card);
+        });
+      } catch (error) {
+        console.error("Error fetching found persons:", error);
+      }
+    }
+
+    const token = localStorage.getItem('token');
+    const name = localStorage.getItem('name');
+    const userCard = document.getElementById('userCard');
+
+    if (token && name) {
+      userCard.innerHTML = `
+        <h3 style="text-align: center; margin-bottom: 1em;">Welcome, ${name}</h3>
+        <button onclick="logout()" style="width: 100%; padding: 10px; background-color: #FFB6B6; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Logout</button>
+      `;
+    } else {
+      userCard.innerHTML = `
+        <h3 style="text-align: center; margin-bottom: 1em;">Join Finder User</h3>
+        <a href="register.html">
+          <button style="width: 100%; padding: 10px; background-color: #C3E4FF; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Register</button>
+        </a>
+        <p style="text-align: center; margin-top: 1em;">
+          Already a user? <a href="login.html" style="color: #007BFF; text-decoration: none;">Login</a>
+        </p>
+      `;
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('name');
+      window.location.reload();
+    }
+
+    fetchFoundPersons();
+  </script>
+</body>
+</html>

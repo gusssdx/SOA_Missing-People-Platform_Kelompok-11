@@ -1,6 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const verifyToken = require('../middleware/verifyToken');
+
+router.get('/me', verifyToken, (req, res) => {
+  res.json({
+    message: 'Welcome!',
+    user: req.user
+  });
+});
+
 
 // Get all users
 router.get('/', (req, res) => {
