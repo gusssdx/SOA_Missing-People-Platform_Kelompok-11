@@ -1,14 +1,21 @@
 const express = require('express');
 const router = express.Router();
+const { uploadMissing } = require('../middleware/upload');
+const verifyToken = require('../middleware/verifyToken');
+const multer = require('multer');
 const db = require('../db');
 
+
 // Get all missing persons
-router.get('/', (req, res) => {
-    db.query('SELECT * FROM missing_persons', (err, results) => {
-        if (err) return res.status(500).json({ error: 'Database query error', details: err });
-        res.json(results);
-    });
-});
+router.get('/', async (req, res) => {
+    try {
+      const [rows] = await db.query('SELECT * FROM missing_persons');
+      res.json(rows);
+    } catch (error) {
+      console.error('Error fetching missing persons:', error.message);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
 
 // Get missing person by ID
 router.get('/:id', (req, res) => {
@@ -22,20 +29,30 @@ router.get('/:id', (req, res) => {
     });
 });
 
-// Create new missing person report
-router.post('/', (req, res) => {
-    const { full_name, age, gender, height, weight, last_seen_location, last_seen_date, photo_url, status } = req.body;
-    
-    if (!full_name || !age || !gender || !height || !weight || !last_seen_location || !last_seen_date || !photo_url || !status) {
-        return res.status(400).json({ error: 'All fields are required' });
-    }
+// Create new missing person in reports page
+router.post('/', verifyToken, uploadMissing.single('photo_url'), async (req, res) => {
+  console.log("Isi req.user =>", req.user); // DEBUG
 
-    db.query('INSERT INTO missing_persons (full_name, age, gender, height, weight, last_seen_location, last_seen_date, photo_url, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [full_name, age, gender, height, weight, last_seen_location, last_seen_date, photo_url, status],
-        (err, result) => {
-            if (err) return res.status(500).json({ error: 'Database insertion error', details: err });
-            res.json({ message: 'Missing person report created successfully', missingId: result.insertId });
-        });
+  const {
+    full_name, age, gender, height, weight,
+    last_seen_location, last_seen_date
+  } = req.body;
+
+  const photoPath = req.file ? req.file.path : null;
+  const userId = req.user.user_id; // ← PERBAIKAN DI SINI
+
+  try {
+    await db.query(`
+      INSERT INTO missing_persons 
+      (user_id, full_name, age, gender, height, weight, last_seen_location, last_seen_date, photo_url)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [userId, full_name, age, gender, height, weight, last_seen_location, last_seen_date, photoPath]);
+
+    res.status(201).json({ message: 'Missing person report submitted successfully.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error while creating report.' });
+  }
 });
 
 // Update missing person details

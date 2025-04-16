@@ -1,0 +1,136 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+  }
+
+  /* Header */
+  .navbar {
+    height: 15vh;
+    padding: 10px 5%;
+    background-color: #C3E4FF;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    height: 50px;
+  }
+
+  .search-bar {
+    display: flex;
+    height: 40%;
+    width: 25%;
+    background-color: #fff;
+    border: none;
+    padding: 1em;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+  }
+
+  .nav-menu {
+    list-style: none;
+    display: flex;
+    gap: 4em;
+    font-weight: bold;
+  }
+
+  .nav-link {
+    text-decoration: none;
+    color: #000;
+  }
+
+  /* Main Layout */
+  .main-content {
+    display: flex;
+    width: 100%;
+    padding: 2em 5%;
+  }
+
+  /* Sidebar Filters */
+  .filter {
+    width: 20%;
+    background-color: #fff;
+    padding: 1em;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+  }
+
+  .filter h3 {
+    margin-bottom: 1em;
+    font-size: 18px;
+  }
+
+  .filter div {
+    margin-bottom: 1em;
+    font-size: 14px;
+  }
+
+  .filter input[type="checkbox"],
+  .filter input[type="radio"] {
+    margin-right: 0.5em;
+  }
+
+  .filter select,
+  .filter input[type="date"],
+  .filter input[type="range"] {
+    width: 100%;
+    margin-top: 0.5em;
+    padding: 4px;
+  }
+
+  /* Cards Container */
+  .container {
+    width: 80%;
+    padding-left: 2em;
+  }
+
+  .container h1 {
+    margin-bottom: 1em;
+    text-align: center;
+  }
+
+  #missingPersonsList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2em;
+    justify-content: flex-start;
+    margin-left: 30px;
+  }
+
+  .card {
+    width: 250px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 1em;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 420px; /* Atur agar semua card punya tinggi minimum */
+  }
+
+  .card img {
+    width: 100%;
+    height: 200px; /* Tetapkan tinggi tetap */
+    object-fit: cover; /* Pastikan gambar tidak "stretch" dan tetap proporsional */
+    border-radius: 6px;
+  }
+
+  .card h3 {
+    margin: 10px 0 5px;
+  }
+
+  .card p {
+    font-size: 14px;
+    margin: 4px 0;
+  }

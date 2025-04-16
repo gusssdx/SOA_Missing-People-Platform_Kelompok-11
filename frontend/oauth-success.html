@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OAuth Success</title>
+</head>
+<body>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        const name = params.get('name');
+      
+        if (token && name) {
+          localStorage.setItem('token', token);
+          localStorage.setItem('name', name);
+          alert("Masuk dengan Google berhasil!");
+          window.location.href = "MissingPerson.html";
+        } else {
+          alert("Gagal login");
+        }
+
+      </script>
+      
+</body>
+</html>

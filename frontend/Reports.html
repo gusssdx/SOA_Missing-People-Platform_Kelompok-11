@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Page</title>
+    <link rel="stylesheet" href="./css/reports-style.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <img src="img/logo.png" alt="Logo" class="logo">
+            <input type="text" placeholder="Search..." class="search-bar">
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="MissingPerson.html" class="nav-link">Missing</a></li>
+                <li class="nav-item"><a href="FoundPerson.html" class="nav-link">Found</a></li>
+                <li class="nav-item"><a href="Reports.html" class="nav-link">Reports</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Settings</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li class="sidebar-item"><button id="missing-person-form-btn" class="sidebar-btn">Missing Person</button></li>
+                <li class="sidebar-item"><button id="found-person-form-btn" class="sidebar-btn">Found Person</button></li>
+            </ul>
+        </aside>
+            
+        <!-- missing person form -->
+        <main class="main-content">
+            <section class="missing-person">
+                <form id="missing-person-form" class="card">
+                    <h1>Missing Person Form</h1>
+                    <label name="full-name">Full Name:</label>
+                    <input class="input-form" type="text" name="full_name" required>
+    
+                    <label name="age">Age:</label>
+                    <input class="input-form" type="number" name="age" required>
+    
+                    <label name="gender">Gender</label>
+                    <div class="radio-container">
+                        <label><input class="radio-item" type="radio" name="gender" value="Male">Pria</label>
+                        <label><input class="radio-item" type="radio" name="gender" value="Female">Wanita</label>
+                    </div>
+    
+                    <label>Height</label>
+                    <input class="input-form" type="number" name="height" required>
+    
+                    <label>Weight</label>
+                    <input class="input-form" type="number" name="weight" required>
+    
+                    <label>Last Seen Location</label>
+                    <input class="input-form" type="text" name="last_seen_location" required>
+    
+                    <label>Last Seen Date</label>
+                    <input class="input-form" type="date" name="last_seen_date" required>
+    
+                    <label>Missing Perosn Photo:</label>
+                    <input id="missing-person-img" class="input-file" type="file" name="photo_url" accept="image/*" required>
+                    <img id="missing-person-preview" class="img-preview hidden" alt="Preview">
+    
+                    <button id="submit" class="submit-btn" type="submit">Submit</button>
+                </form>
+            </section>
+
+            <!-- found person form -->
+            <section class="found-person">
+                <form id="found-person-form" class="card hidden">
+                    <h1>Missing Person Form</h1>
+                    <label name="found_location">Found Location:</label>
+                    <input class="input-form" type="text" name="found_location" required>
+    
+                    <label name="found_date">Found Date:</label>
+                    <input class="input-form" type="date" name="found_date" required>
+    
+                    <label>Description:</label>
+                    <input class="input-form" type="text" name="description" required>
+    
+                    <label>Found Person Photo:</label>
+                    <input id="found-person-img" type="file" accept="image/*" name="photo_url" required>
+                    <img id="found-person-preview" class="img-preview hidden" alt="Preview">
+                    <button id="submit" class="submit-btn" type="submit">Submit</button>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <script src="./js/reports-JS.js"></script>
+</body>
+</html>

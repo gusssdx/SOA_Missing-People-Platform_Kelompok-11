@@ -1,14 +1,19 @@
 const express = require('express');
+const { uploadFound } = require('../middleware/upload');
+const verifyToken = require('../middleware/verifyToken');
 const router = express.Router();
 const db = require('../db');
 
 // Get all found persons
-router.get('/', (req, res) => {
-    db.query('SELECT * FROM found_persons', (err, results) => {
-        if (err) return res.status(500).json({ error: 'Database query error', details: err });
-        res.json(results);
-    });
-});
+router.get('/', async (req, res) => {
+    try {
+      const [rows] = await db.query('SELECT * FROM found_persons')
+      res.json(rows);
+    } catch (error) {
+      console.error('Error fetching found persons:', error.message);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
 
 // Get found person by ID
 router.get('/:id', (req, res) => {
@@ -22,21 +27,29 @@ router.get('/:id', (req, res) => {
     });
 });
 
-// Create new found person record
-router.post('/', (req, res) => {
-    const { found_location, found_date, photo_url, description, status } = req.body;
+// Create new found person in reports page
+router.post('/', verifyToken, uploadFound.single('photo_url'), async (req, res) => {
+  console.log("Isi req.user =>", req.user); // DEBUG
+    const { 
+      found_location, found_date, description 
+    } = req.body;
 
-    if (!found_location || !found_date || !photo_url || !description || !status){
-        return res.status(404).json({error : "All filed are required"})
+    const photoPath = req.file ? req.file.path : null;
+    const userId = req.user.user_id; 
+  
+    try {
+      await db.query(`
+        INSERT INTO found_persons 
+        (user_id, found_location, found_date, description, photo_url)
+        VALUES (?, ?, ?, ?, ?)
+      `, [userId, found_location, found_date, description, photoPath]);
+  
+      res.status(201).json({ message: 'Found person report submitted successfully.' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Database error while creating report.' });
     }
-
-    db.query('INSERT INTO found_persons (found_location, found_date, photo_url, description, status) VALUES (?, ?, ?, ?, ?)',
-        [found_location, found_date, photo_url, description, status],
-        (err, result) => {
-            if (err) return res.status(500).json({ error: 'Database query error', details: err });
-            res.json({ message: 'Found person record created successfully', foundId: result.insertId });
-        });
-});
+  });
 
 
 // Update found person status
