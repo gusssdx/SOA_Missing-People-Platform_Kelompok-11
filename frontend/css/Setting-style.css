@@ -1,0 +1,90 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+  }
+
+  /* Header */
+  .navbar {
+    height: 15vh;
+    padding: 10px 5%;
+    background-color: #C3E4FF;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    height: 50px;
+  }
+
+  .search-bar {
+    display: flex;
+    height: 40%;
+    width: 25%;
+    background-color: #fff;
+    border: none;
+    padding: 1em;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+  }
+
+  .nav-menu {
+    list-style: none;
+    display: flex;
+    gap: 4em;
+    font-weight: bold;
+  }
+
+  .nav-link {
+    text-decoration: none;
+    color: #000;
+  }
+  .settings-container {
+    max-width: 500px;
+    margin: 0 auto;
+    background: white;
+    padding: 2em;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+
+  .settings-container h2 {
+    text-align: center;
+    margin-bottom: 1em;
+  }
+
+  .settings-container label {
+    display: block;
+    margin-bottom: 0.2em;
+    font-weight: bold;
+  }
+
+  .settings-container input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 1em;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+
+  .settings-container button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .settings-container button:hover {
+    background-color: #0056b3;
+  }

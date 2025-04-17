@@ -17,9 +17,10 @@ form.addEventListener('submit', async (e) => {
     // Simpan token dan nama ke localStorage
     localStorage.setItem('token', data.token);
     localStorage.setItem('name', data.user.name);
+    localStorage.setItem('user_id', data.user.user_id);
 
     // Redirect ke halaman MissingPersons.html
-    window.location.href = 'MissingPersons.html';
+    window.location.href = 'MissingPerson.html';
   } else {
     alert(data.error || 'Login gagal');
   }

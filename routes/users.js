@@ -4,12 +4,61 @@ const db = require('../db');
 const verifyToken = require('../middleware/verifyToken');
 
 router.get('/me', verifyToken, (req, res) => {
-  res.json({
-    message: 'Welcome!',
-    user: req.user
-  });
-});
+    console.log('User ID:', req.user.user_id);
 
+
+    const userId = req.user.user_id;
+
+    db.query('SELECT name, email, phone_number FROM users WHERE user_id = ?', [userId], (err, result) => {
+        if (err) {
+            console.error('Database query error:', err);
+            return res.status(500).json({ error: 'Database query error', details: err });
+        }
+
+        if (result.length === 0) {
+            console.log('User not found');
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        console.log('User data back:', result[0]);
+        res.json({
+            message: 'User data retrieved successfully',
+            user: result[0]
+        });
+    });
+});
+  
+  // Update current logged-in user
+  router.put('/me', verifyToken, (req, res) => {
+    console.log('verifyToken success:', req.user); // Cek di console apakah token valid dan berhasil ter-decode
+      const userId = req.user.user_id;
+      const { name, email, phone_number } = req.body;
+    
+      db.query('SELECT * FROM users WHERE user_id = ?', [userId], (err, result) => {
+        if (err) return res.status(500).json({ error: 'Database query error', details: err });
+        if (result.length === 0) return res.status(404).json({ error: 'User not found' });
+    
+        const oldData = result[0];
+    
+        const updatedName = name !== undefined ? name : oldData.name;
+        const updatedEmail = email !== undefined ? email : oldData.email;
+        const updatedPhoneNumber = phone_number !== undefined ? phone_number : oldData.phone_number;
+    
+        db.query(
+          'UPDATE users SET name=?, email=?, phone_number=? WHERE user_id=?',
+          [updatedName, updatedEmail, updatedPhoneNumber, userId],
+          (err, result) => {
+            if (err) return res.status(500).json({ error: 'Database update error', details: err });
+    
+            if (result.affectedRows === 0) {
+              return res.status(400).json({ error: 'No changes made to the user' });
+            }
+    
+            res.json({ message: 'User updated successfully' });
+          }
+        );
+      });
+    });
 
 // Get all users
 router.get('/', (req, res) => {
@@ -46,50 +95,8 @@ router.post('/', (req, res) => {
         });
 });
 
-router.put('/:id', (req, res) => {
-    const { id } = req.params;
-    const { name, email, password, phone_number, role } = req.body;
-
-    db.query('SELECT * FROM users WHERE user_id = ?', [id], (err, result) => {
-        if (err) return res.status(500).json({ error: 'Database query error', details: err });
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        const oldData = result[0];
-
-        console.log("Request Body:", req.body);
-        console.log("Old Data:", oldData);
-
-        const updatedName = name !== undefined ? name : oldData.name;
-        const updatedEmail = email !== undefined ? email : oldData.email;
-        const updatedPassword = password !== undefined ? password : oldData.password;
-        const updatedPhoneNumber = phone_number !== undefined ? phone_number : oldData.phone_number;
-        const updatedRole = role !== undefined ? role : oldData.role;
-
-        console.log("Updated Data:", {
-            name: updatedName,
-            email: updatedEmail,
-            password: updatedPassword,
-            phone_number: updatedPhoneNumber,
-            role: updatedRole
-        });
-
-        db.query(
-            'UPDATE users SET name=?, email=?, password=?, phone_number=?, role=? WHERE user_id=?',
-            [updatedName, updatedEmail, updatedPassword, updatedPhoneNumber, updatedRole, id],
-            (err, result) => {
-                if (err) return res.status(500).json({ error: 'Database update error', details: err });
-
-                if (result.affectedRows === 0) {
-                    return res.status(400).json({ error: 'No changes made to the user' });
-                }
-
-                res.json({ message: 'User updated successfully' });
-            }
-        );
-    });
-});
+  
+  
 
 
 // Delete user
