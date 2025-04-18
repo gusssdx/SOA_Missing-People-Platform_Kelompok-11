@@ -15,16 +15,22 @@ router.get('/', async (req, res) => {
     }
   });
 
-// Get found person by ID
-router.get('/:id', (req, res) => {
-    const { id } = req.params;
-    db.query('SELECT * FROM found_persons WHERE found_id = ?', [id], (err, result) => {
-        if (err) return res.status(500).json({ error: 'Database query error', details: err });
-        if (result.length === 0){
-            return res.status(404).json({error : "Persons not found"})
-        }    
-        res.json(result[0]);
-    });
+// Get found person by ID (with async/await)
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [rows] = await db.query('SELECT * FROM found_persons WHERE found_id = ?', [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Person not found' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Database query error:', err);
+    res.status(500).json({ error: 'Database query error', details: err });
+  }
 });
 
 // Create new found person in reports page

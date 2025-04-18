@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const { reportMissing } = require('../middleware/upload');
+const verifyToken = require('../middleware/verifyToken');
 const db = require('../db');
 
 // Get all reports
@@ -22,21 +24,30 @@ router.get('/:id', (req, res) => {
     });
 });
 
-// Create new report
-router.post('/', (req, res) => {
-    const { user_id, missing_id, description, report_date, status } = req.body;
-    
-    if (!user_id || !missing_id || !description || !report_date || !status){
-        return res.status(404).json({error: "All field are required"})
+// POST /reports
+router.post('/', verifyToken, reportMissing.single('photo'), async (req, res) => {
+    const { user_id, missing_id, description } = req.body;
+    const photo = req.file;
+  
+    if (!user_id || !missing_id || !description || !photo) {
+      return res.status(400).json({ message: 'Semua field wajib diisi.' });
     }
-    
-    db.query('INSERT INTO reports (user_id, missing_id, description, report_date, status) VALUES (?, ?, ?, ?, ?)',
-        [user_id, missing_id, description, report_date, status],
-        (err, result) => {
-            if (err) return res.status(500).json({ error: 'Database insertion error', details: err });
-            res.json({ message: 'Report created successfully', reportId: result.insertId });
-        });
-});
+  
+    try {
+      const photoUrl = `uploads/report-missing-photos/${photo.filename}`;
+  
+      await db.query(
+        `INSERT INTO reports (user_id, missing_id, description, photo_url, status) VALUES (?, ?, ?, ?, ?)`,
+        [user_id, missing_id, description, photoUrl, 'pending']
+      );
+  
+      res.status(201).json({ message: 'Laporan berhasil disimpan.' });
+    } catch (error) {
+      console.error('Error menyimpan laporan:', error);
+      res.status(500).json({ message: 'Gagal menyimpan laporan.' });
+    }
+  });
+  
 
 // Update report
 router.put('/:id', (req, res) => {

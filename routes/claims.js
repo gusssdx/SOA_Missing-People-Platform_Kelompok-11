@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-
+const { claimFound } = require('../middleware/upload');
+const verifyToken = require('../middleware/verifyToken');
 // Get all claims
 router.get('/', (req, res) => {
     db.query('SELECT * FROM claims', (err, results) => {
@@ -22,23 +23,31 @@ router.get('/:id', (req, res) => {
     });
 });
 
-// Create new claim
-router.post('/', (req, res) => {
-    const { user_id, found_id, relationship, evidence_url, found_location, status } = req.body;
+// POST /claims
+router.post('/', verifyToken, claimFound.single('photo'), async (req, res) => {
+    const { user_id, found_id, description, relationship } = req.body;
+    const photo = req.file;
 
-    if (!user_id || !found_id || !relationship || !evidence_url || !found_location || !status) {
-        return res.status(400).json({ error: "All fields are required" });
+    if (!user_id || !found_id || !description || !relationship || !photo) {
+        return res.status(400).json({ message: 'Semua field wajib diisi.' });
     }
 
-    db.query(
-        'INSERT INTO claims (user_id, found_id, relationship, evidence_url, found_location, status) VALUES (?, ?, ?, ?, ?, ?)',
-        [user_id, found_id, relationship, evidence_url, found_location, status],
-        (err, result) => {
-            if (err) return res.status(500).json({ error: 'Database insertion error', details: err });
-            res.json({ message: 'Claim created successfully', claimId: result.insertId });
-        }
-    );
+    try {
+        const photoUrl = `uploads/claim-found-photos/${photo.filename}`;
+        const status = 'pending';
+
+        await db.query(
+            `INSERT INTO claims (user_id, found_id, relationship, photo_url, description, status) VALUES (?, ?, ?, ?, ?, ?)`,
+            [user_id, found_id, relationship, photoUrl, description, status]
+        );
+
+        res.status(201).json({ message: 'Klaim berhasil dikirim.' });
+    } catch (error) {
+        console.error('Error menyimpan klaim:', error);
+        res.status(500).json({ message: 'Gagal menyimpan klaim.' });
+    }
 });
+
 
 // Update claim
 router.put('/:id', (req, res) => {

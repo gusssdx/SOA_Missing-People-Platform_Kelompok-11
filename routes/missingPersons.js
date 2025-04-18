@@ -17,17 +17,23 @@ router.get('/', async (req, res) => {
     }
   });
 
-// Get missing person by ID
-router.get('/:id', (req, res) => {
+  router.get('/:id', async (req, res) => {
     const { id } = req.params;
-    db.query('SELECT * FROM missing_persons WHERE missing_id = ?', [id], (err, result) => {
-        if (err) return res.status(500).json({ error: 'Database query error', details: err });
-        if (result.length === 0) {
-            return res.status(404).json({ error: "Missing person not found" });
-        }
-        res.json(result[0]);
-    });
-});
+    try {
+      console.log('Fetching missing person with ID:', id);
+      const [rows] = await db.query('SELECT * FROM missing_persons WHERE missing_id = ?', [id]);
+  
+      if (rows.length === 0) {
+        return res.status(404).json({ error: "Missing person not found" });
+      }
+  
+      console.log('Found person:', rows[0]);
+      res.json(rows[0]);
+    } catch (err) {
+      console.error('Error saat mengambil data:', err.message);
+      res.status(500).json({ error: 'Database query error', details: err });
+    }
+  });  
 
 // Create new missing person in reports page
 router.post('/', verifyToken, uploadMissing.single('photo_url'), async (req, res) => {
